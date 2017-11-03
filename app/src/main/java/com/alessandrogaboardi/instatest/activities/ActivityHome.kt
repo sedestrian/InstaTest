@@ -1,5 +1,7 @@
 package com.alessandrogaboardi.instatest.activities
 
+import android.app.Activity
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -23,33 +25,6 @@ class ActivityHome : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         setSupportActionBar(toolbar)
-
-        checkToken()
-    }
-
-    private fun checkToken(){
-        if(DaoToken.isEmpty()){
-            login()
-        }else{
-            setupUserData()
-        }
-    }
-
-    private fun login(){
-        startActivity(getLoginIntent())
-    }
-
-    private fun setupUserData(){
-        ApiManager.getUserData(object: UserDataCallback{
-            override fun onSuccess(call: Call?, response: Response?) {
-
-            }
-
-            override fun onError(call: Call?, e: IOException?) {
-
-            }
-
-        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

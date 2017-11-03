@@ -13,7 +13,7 @@ object ApiManager {
 
     fun getUserData(callback: UserDataCallback){
         val request = Request.Builder()
-                .url(ApiConstants.GET_USER_INFO + DaoToken.getToken())
+                .url(ApiConstants.GET_USER_INFO + DaoToken.getToken()?.token)
                 .build()
 
         addToRequestQueue(request, callback)

@@ -1,5 +1,6 @@
 package com.alessandrogaboardi.instatest.activities
 
+import android.app.Activity
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.webkit.WebViewClient
@@ -15,7 +16,12 @@ class ActivityLogin : AppCompatActivity() {
 
         supportActionBar?.title = "Login"
 
-        val client = LoginWebClient({ finish() },{})
+        val client = LoginWebClient({
+            setResult(Activity.RESULT_OK)
+            finish()
+        },{
+           setResult(Activity.RESULT_CANCELED)
+        })
         webView.webViewClient = client
         webView.loadUrl(getString(R.string.login_url))
     }
