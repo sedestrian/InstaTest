@@ -12,7 +12,7 @@ import java.io.IOException
 /**
  * Created by alessandrogaboardi on 02/11/2017.
  */
-interface UserDataCallback: Callback {
+interface UserDataCallback: ApiCallback {
     val USER_OBJECT get() = "data"
 
     override fun onFailure(call: Call?, e: IOException?) {
@@ -29,7 +29,4 @@ interface UserDataCallback: Callback {
 
         onSuccess(call, response)
     }
-
-    fun onSuccess(call: Call?, response: Response?)
-    fun onError(call: Call?, e: IOException?)
 }

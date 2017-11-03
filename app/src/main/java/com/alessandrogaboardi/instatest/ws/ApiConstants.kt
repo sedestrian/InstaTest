@@ -8,4 +8,5 @@ object ApiConstants {
     val BASE_API_URL = BASE_URL + "v1/"
 
     val GET_USER_INFO = BASE_API_URL + "users/self/?access_token="
+    val GET_SELF_MEDIA = BASE_API_URL + "users/self/media/recent/?access_token="
 }
