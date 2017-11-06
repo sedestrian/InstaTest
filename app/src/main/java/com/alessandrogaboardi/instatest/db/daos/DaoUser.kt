@@ -8,14 +8,12 @@ import com.alessandrogaboardi.instatest.db.models.ModelUser
 object DaoUser : BaseDao() {
     fun saveUser(user: ModelUser) {
         executeTransaction {
-            it.copyToRealmOrUpdate(user)
+            it.delete(ModelUser::class.java)
+            it.copyToRealm(user)
         }
     }
 
-    fun getUser(): ModelUser? {
-        val result = realm.where(ModelUser::class.java).findFirst()
-        result?.let {
-            return realm.copyFromRealm(it)
-        } ?: return null
+    fun getUserAsync(): ModelUser {
+        return realm.where(ModelUser::class.java).findFirstAsync()
     }
 }
