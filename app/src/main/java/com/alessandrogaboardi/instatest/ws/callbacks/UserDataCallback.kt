@@ -13,16 +13,14 @@ import java.io.IOException
  * Created by alessandrogaboardi on 02/11/2017.
  */
 interface UserDataCallback: ApiCallback {
-    val USER_OBJECT get() = "data"
-
     override fun onFailure(call: Call?, e: IOException?) {
         //CODE HERE
         onError(call, e)
     }
 
     override fun onResponse(call: Call?, response: Response){
-        val jsonString = JSONObject(String(response.body()!!.bytes()))
-        val userJson = jsonString.getJSONObject(USER_OBJECT)
+        val jsonObject = JSONObject(String(response.body()!!.bytes()))
+        val userJson = jsonObject.getJSONObject(DATA_FIELD)
         val user = Gson().fromJson<ModelUser>(userJson.toString(), ModelUser::class.java)
 
         DaoUser.saveUser(user)

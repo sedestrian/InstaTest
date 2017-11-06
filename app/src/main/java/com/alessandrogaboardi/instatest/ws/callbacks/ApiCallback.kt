@@ -13,6 +13,8 @@ import java.io.IOException
  * Created by alessandrogaboardi on 03/11/2017.
  */
 interface ApiCallback: Callback {
+    val DATA_FIELD get() = "data"
+
     override fun onFailure(call: Call?, e: IOException?)
     override fun onResponse(call: Call?, response: Response)
 

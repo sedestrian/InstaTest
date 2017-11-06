@@ -1,6 +1,7 @@
 package com.alessandrogaboardi.instatest.ws
 
 import com.alessandrogaboardi.instatest.db.daos.DaoToken
+import com.alessandrogaboardi.instatest.ws.callbacks.LikeMediaCallback
 import com.alessandrogaboardi.instatest.ws.callbacks.UserDataCallback
 import com.alessandrogaboardi.instatest.ws.callbacks.UserPicturesCallback
 import okhttp3.*
@@ -23,6 +24,31 @@ object ApiManager {
     fun getSelfMedia(callback: UserPicturesCallback){
         val request = Request.Builder()
                 .url(ApiConstants.GET_SELF_MEDIA + DaoToken.getToken()?.token)
+                .build()
+
+        addToRequestQueue(request, callback)
+    }
+
+    fun likeMedia(media_id: String, callback: LikeMediaCallback){
+        val url = String.format(ApiConstants.LIKE_PICTURE, media_id) + DaoToken.getToken()?.token
+        println(url)
+        val body = RequestBody.create(null, String())
+
+        val request = Request.Builder()
+                .url(url)
+                .post(body)
+                .build()
+
+        addToRequestQueue(request, callback)
+    }
+
+    fun dislikeMedia(media_id: String, callback: LikeMediaCallback){
+        val url = String.format(ApiConstants.DISLIKE_PICTURE, media_id) + DaoToken.getToken()?.token
+        println(url)
+
+        val request = Request.Builder()
+                .url(url)
+                .delete()
                 .build()
 
         addToRequestQueue(request, callback)
