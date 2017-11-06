@@ -27,4 +27,5 @@
     <string name="error_retrieving_data">Error retrieving data</string>
     <string name="error_dislike">Error disliking media</string>
     <string name="error_like">Error liking media</string>
+    <string name="pictures_folder">/Coonstagram</string>
 </resources>

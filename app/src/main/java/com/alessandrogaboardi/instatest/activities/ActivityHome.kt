@@ -55,8 +55,8 @@ class ActivityHome : AppCompatActivity(), ActivityHomeCommunicator {
                 Pair(view.commentsIcon, getString(R.string.transition_media_detail_comment_icon)),
 //                Pair(view.comments, getString(R.string.transition_media_detail_comment_text)),
                 Pair(view.userPicture, getString(R.string.transition_media_detail_user_picture)),
-                Pair(view.username, getString(R.string.transition_media_detail_username)),
-                Pair(view.description, getString(R.string.transition_media_detail_description))
+                Pair(view.username, getString(R.string.transition_media_detail_username))
+//                Pair(view.description, getString(R.string.transition_media_detail_description))
         )
 
         startActivity(intent, options.toBundle())
