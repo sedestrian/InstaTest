@@ -1,13 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources[
-    <!ENTITY CLIENT_ID "3feb038bb46d4d848121b3b9f17e3a0e">
-    <!ENTITY REDIRECT_URI "http://www.instagram.com">
-    ]>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources[<!ENTITY CLIENT_ID "3feb038bb46d4d848121b3b9f17e3a0e"><!ENTITY REDIRECT_URI "http://www.instagram.com">]>
 <resources>
-    <string name="app_name">InstaTest</string>
+    <string name="app_name">Coonstagram</string>
     <string name="action_settings">Settings</string>
 
     <string name="client_id">&CLIENT_ID;</string>
     <string name="redirect_uri">&REDIRECT_URI;</string>
 
-    <string name="login_url">https://api.instagram.com/oauth/authorize/?client_id=&CLIENT_ID;&amp;redirect_uri=&REDIRECT_URI;&amp;response_type=token</string>
+    <string name="login_url">https://api.instagram.com/oauth/authorize/?client_id=&CLIENT_ID;&amp;redirect_uri=&REDIRECT_URI;&amp;scope=basic+likes+comments+relationships&amp;response_type=token</string>
+
+    <!-- Transition names -->
+    <string name="profile_icon_transition_name">profile_icon_transition</string>
+    <string name="fullscreen_element_name">fullscreen_picture_transition</string>
+    <string name="transition_media_detail">transition_name_media_detail</string>
+    <string name="transition_media_detail_image">transition_name_media_detail_image_view</string>
+    <string name="transition_media_detail_liked_icon">transition_name_media_detail_liked_icon</string>
+    <string name="transition_media_detail_liked_text">transition_name_media_detail_liked_text</string>
+    <string name="transition_media_detail_comment_icon">transition_name_media_detail_comment_icon</string>
+    <string name="transition_media_detail_comment_text">transition_name_media_detail_comment_text</string>
+    <string name="transition_media_detail_user_picture">transition_name_media_detail_user_picture</string>
+    <string name="transition_media_detail_username">transition_name_media_detail_username</string>
+    <string name="transition_media_detail_description">transition_name_media_detail_description</string>
+
+    <string name="posts">posts</string>
+    <string name="followers">followers</string>
+    <string name="following">following</string>
+    <string name="error_retrieving_data">Error retrieving data</string>
+    <string name="error_dislike">Error disliking media</string>
+    <string name="error_like">Error liking media</string>
 </resources>
