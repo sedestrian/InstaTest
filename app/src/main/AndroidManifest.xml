@@ -3,8 +3,8 @@
     package="com.alessandrogaboardi.instatest">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".App"
@@ -31,7 +31,9 @@
         <activity
             android:name=".activities.ActivityFullscreenPicture"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.ActivityMediaDetail" />
+        <activity
+            android:name=".activities.ActivityMediaDetail"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

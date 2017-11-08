@@ -9,23 +9,17 @@ import com.alessandrogaboardi.instatest.R
 import com.alessandrogaboardi.instatest.adapters.holders.GalleryViewHolder
 import com.alessandrogaboardi.instatest.db.daos.DaoMedia
 import com.alessandrogaboardi.instatest.db.models.ModelMedia
-import com.alessandrogaboardi.instatest.kotlin.extensions.setGone
-import com.alessandrogaboardi.instatest.kotlin.extensions.setVisible
-import com.alessandrogaboardi.instatest.kotlin.extensions.snack
-import com.alessandrogaboardi.instatest.modules.GlideApp
 import com.alessandrogaboardi.instatest.ws.ApiManager
-import com.alessandrogaboardi.instatest.ws.callbacks.LikeMediaCallback
 import com.alessandrogaboardi.instatest.ws.callbacks.UserPicturesCallback
 import io.realm.Realm
 import okhttp3.Call
 import okhttp3.Response
-import org.jetbrains.anko.runOnUiThread
 import java.io.IOException
 
 /**
  * Created by alessandro on 04/11/2017.
  */
-class GalleryAdapter(val context: Context, val dataDownloaded: (() -> Unit)?, val onDetailRequested: ((item: ModelMedia, view: View) -> Unit)?) : RecyclerView.Adapter<GalleryViewHolder>() {
+class GalleryAdapter(val context: Context, val dataDownloaded: (() -> Unit)?, val dataDownloadError: (() -> Unit)?, val onDetailRequested: ((item: ModelMedia, view: View) -> Unit)?) : RecyclerView.Adapter<GalleryViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var pictures: MutableList<ModelMedia> = mutableListOf()
 
@@ -56,13 +50,13 @@ class GalleryAdapter(val context: Context, val dataDownloaded: (() -> Unit)?, va
     private fun downloadData() {
         ApiManager.getSelfMedia(object : UserPicturesCallback {
             override fun onSuccess(call: Call?, response: Response?) {
-                context.runOnUiThread {
-                    dataDownloaded?.invoke()
-                    setupLocal()
-                }
+                dataDownloaded?.invoke()
+                setupLocal()
             }
 
-            override fun onError(call: Call?, e: IOException?) {}
+            override fun onError(call: Call?, e: IOException?) {
+                dataDownloadError?.invoke()
+            }
         })
     }
 

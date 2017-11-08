@@ -1,6 +1,5 @@
 package com.alessandrogaboardi.instatest.adapters.holders
 
-import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.alessandrogaboardi.instatest.R
@@ -15,7 +14,6 @@ import com.alessandrogaboardi.instatest.ws.callbacks.LikeMediaCallback
 import kotlinx.android.synthetic.main.gallery_item.view.*
 import okhttp3.Call
 import okhttp3.Response
-import org.jetbrains.anko.runOnUiThread
 import java.io.IOException
 
 /**
@@ -30,7 +28,7 @@ class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var userPicture = itemView.userPicture
     var description = itemView.description
 
-    fun bind(item: ModelMedia, onDetailRequested: ((item: ModelMedia, mainView: View) -> Unit)?){
+    fun bind(item: ModelMedia, onDetailRequested: ((item: ModelMedia, mainView: View) -> Unit)?) {
         val pict = item.images?.low_resolution
         val userPict = item.user?.profile_picture
         val username = item.user?.username
@@ -78,14 +76,12 @@ class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private fun dislikeMedia(media: ModelMedia) {
         ApiManager.dislikeMedia(media.id, object : LikeMediaCallback {
             override fun onSuccess(call: Call?, response: Response?) {
-                itemView.context.runOnUiThread {
-                    DaoMedia.setDisliked(media.id)
-                    media.user_has_liked = false
-                    if(media.likes != null){
-                        media.likes!!.count = media.likes!!.count - 1
-                    }
-                    updateLikeIcon(media)
+                DaoMedia.setDisliked(media.id)
+                media.user_has_liked = false
+                if (media.likes != null) {
+                    media.likes!!.count = media.likes!!.count - 1
                 }
+                updateLikeIcon(media)
             }
 
             override fun onError(call: Call?, e: IOException?) {
@@ -97,14 +93,12 @@ class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private fun likeMedia(media: ModelMedia) {
         ApiManager.likeMedia(media.id, object : LikeMediaCallback {
             override fun onSuccess(call: Call?, response: Response?) {
-                itemView.context.runOnUiThread {
-                    DaoMedia.setLiked(media.id)
-                    media.user_has_liked = true
-                    if(media.likes != null){
-                        media.likes!!.count = media.likes!!.count + 1
-                    }
-                    updateLikeIcon(media)
+                DaoMedia.setLiked(media.id)
+                media.user_has_liked = true
+                if (media.likes != null) {
+                    media.likes!!.count = media.likes!!.count + 1
                 }
+                updateLikeIcon(media)
             }
 
             override fun onError(call: Call?, e: IOException?) {

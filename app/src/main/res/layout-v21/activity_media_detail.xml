@@ -8,14 +8,42 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/picture"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:scaleType="fitXY"
-            android:src="@drawable/picture"
-            android:transitionName="@string/transition_media_detail_image" />
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/pictureErrorLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/red"
+                android:gravity="center"
+                android:minHeight="250dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:src="@drawable/sad" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/something_went_wrong"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Large.Inverse"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/picture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="fitXY"
+                android:transitionName="@string/transition_media_detail_image" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/controlsLayout"
@@ -65,7 +93,7 @@
                     android:id="@+id/progress"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
             </RelativeLayout>
 
         </LinearLayout>
@@ -82,7 +110,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginStart="4dp"
-                android:text="54"
                 android:transitionName="@string/transition_media_detail_liked_text" />
 
             <TextView
@@ -90,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="4dp"
-                android:text="likes" />
+                android:text="@string/likes" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -104,14 +131,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="12"
                 android:transitionName="@string/transition_media_detail_comment_text" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:text="comments" />
+                android:text="@string/comments" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -143,7 +169,6 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/picture"
                 android:transitionName="@string/transition_media_detail_user_picture" />
 
             <TextView
@@ -152,7 +177,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_margin="8dp"
-                android:text="sedestrian"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:textStyle="bold"
                 android:transitionName="@string/transition_media_detail_username" />

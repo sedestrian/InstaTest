@@ -28,4 +28,10 @@
     <string name="error_dislike">Error disliking media</string>
     <string name="error_like">Error liking media</string>
     <string name="pictures_folder">/Coonstagram</string>
+    <string name="error_occurred">An error occurred, try again</string>
+    <string name="retry">retry</string>
+    <string name="no_pictures">No pictures here!</string>
+    <string name="comments">comments</string>
+    <string name="likes">likes</string>
+    <string name="something_went_wrong">Oops... Something went wrong</string>
 </resources>

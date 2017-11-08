@@ -1,5 +1,7 @@
 package com.alessandrogaboardi.instatest.ws.callbacks
 
+import android.os.Handler
+import android.os.Looper
 import com.alessandrogaboardi.instatest.db.daos.DaoUser
 import com.alessandrogaboardi.instatest.db.models.ModelUser
 import com.google.gson.Gson

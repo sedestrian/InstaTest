@@ -25,21 +25,6 @@ class ActivityHome : AppCompatActivity(), ActivityHomeCommunicator {
         supportActionBar?.title = getString(R.string.app_name)
 
         replaceMainFragment(FragmentHome.newInstance(), R.id.placeholder, false)
-
-        profileIcon.setOnClickListener {
-            openProfileActivity()
-        }
-    }
-
-    private fun openProfileActivity() {
-        val intent = Intent(this, ActivityUserProfile::class.java)
-        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this,
-                profileIcon,
-                getString(R.string.profile_icon_transition_name)
-        )
-
-        startActivity(intent, options.toBundle())
     }
 
 

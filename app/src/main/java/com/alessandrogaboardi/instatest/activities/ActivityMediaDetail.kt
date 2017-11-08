@@ -102,11 +102,13 @@ class ActivityMediaDetail : AppCompatActivity() {
                 .dontAnimate()
                 .listener(object : RequestListener<Drawable> {
                     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                        pictureErrorLayout.setVisible()
                         supportStartPostponedEnterTransition()
                         return false
                     }
 
                     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                        pictureErrorLayout.setGone()
                         supportStartPostponedEnterTransition()
                         return false
                     }
@@ -129,14 +131,12 @@ class ActivityMediaDetail : AppCompatActivity() {
     private fun dislikeMedia(media: ModelMedia) {
         ApiManager.dislikeMedia(media.id, object : LikeMediaCallback {
             override fun onSuccess(call: Call?, response: Response?) {
-                runOnUiThread {
-                    DaoMedia.setDisliked(media.id)
-                    media.user_has_liked = false
-                    if (media.likes != null) {
-                        media.likes!!.count = media.likes!!.count - 1
-                    }
-                    updateLikeIcon(media)
+                DaoMedia.setDisliked(media.id)
+                media.user_has_liked = false
+                if (media.likes != null) {
+                    media.likes!!.count = media.likes!!.count - 1
                 }
+                updateLikeIcon(media)
             }
 
             override fun onError(call: Call?, e: IOException?) {
@@ -148,14 +148,12 @@ class ActivityMediaDetail : AppCompatActivity() {
     private fun likeMedia(media: ModelMedia) {
         ApiManager.likeMedia(media.id, object : LikeMediaCallback {
             override fun onSuccess(call: Call?, response: Response?) {
-                runOnUiThread {
-                    DaoMedia.setLiked(media.id)
-                    media.user_has_liked = true
-                    if (media.likes != null) {
-                        media.likes!!.count = media.likes!!.count + 1
-                    }
-                    updateLikeIcon(media)
+                DaoMedia.setLiked(media.id)
+                media.user_has_liked = true
+                if (media.likes != null) {
+                    media.likes!!.count = media.likes!!.count + 1
                 }
+                updateLikeIcon(media)
             }
 
             override fun onError(call: Call?, e: IOException?) {
@@ -193,7 +191,7 @@ class ActivityMediaDetail : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        
+
     }
 
     private fun downloadPicture(item: ModelMedia) {
