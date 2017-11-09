@@ -1,8 +1,6 @@
 package com.alessandrogaboardi.instatest.activities
 
 import android.Manifest
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -15,13 +13,10 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import android.view.View
-import android.view.animation.AlphaAnimation
-import android.view.animation.Animation
 import android.webkit.URLUtil
 import android.widget.ImageView
 import com.alessandrogaboardi.instatest.R
@@ -114,48 +109,14 @@ class ActivityMediaDetail : AppCompatActivity() {
         }
 
         if (media.isVideo()) {
-            val uri = Uri.parse(media.videos?.standard_resolution?.url)
-            video.setVideoURI(uri)
-            video.setOnClickListener {
-                showButton()
+            setShareHandler(media)
+            picture.setGone()
+            videoView.setPreviewImage(media.images?.standard_resolution?.url)
+            videoView.setVideoURL(media.videos?.standard_resolution?.url)
+            videoView.setOnPreviewLoaded {
+                supportStartPostponedEnterTransition()
             }
-            video.requestLayout()
-            video.setOnCompletionListener {
-                playing = false
-                play.setImageResource(R.drawable.play)
-            }
-            GlideApp.with(this).load(media.images?.standard_resolution?.url)
-                    .dontAnimate()
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                            pictureErrorLayout.setVisible()
-                            supportStartPostponedEnterTransition()
-                            return false
-                        }
-
-                        override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                            pictureErrorLayout.setGone()
-                            supportStartPostponedEnterTransition()
-                            play.setOnClickListener {
-                                if (playing) {
-                                    video.pause()
-                                    play.setImageResource(R.drawable.play)
-                                    playing = false
-                                } else {
-                                    if (picture.visibility == View.VISIBLE)
-                                        picture.setGone()
-                                    video.start()
-                                    play.setImageResource(R.drawable.pause)
-                                    playing = true
-                                    Handler().postDelayed({
-                                        hideButton()
-                                    }, 500)
-                                }
-                            }
-                            return false
-                        }
-                    })
-                    .into(picture)
+            videoView.setOnPreviewLoadError { supportStartPostponedEnterTransition() }
         } else {
             GlideApp.with(this).load(media.images?.standard_resolution?.url)
                     .dontAnimate()
@@ -174,40 +135,27 @@ class ActivityMediaDetail : AppCompatActivity() {
                         }
                     })
                     .into(picture)
+            picture.setOnClickListener {
+                val intent = Intent(this, ActivityFullscreenPicture::class.java)
+                intent.putExtra(ActivityFullscreenPicture.PICTURE_ID_EXTRA, media.id)
+
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        this,
+                        picture,
+                        getString(R.string.fullscreen_element_name)
+                )
+
+                startActivity(intent, options.toBundle())
+            }
         }
         GlideApp.with(this).load(user_pic).circleCrop().into(userPicture)
     }
 
-    fun hideButton(){
-        val animation = AlphaAnimation(1f, 0f)
-        animation.duration = 500
-        animation.fillAfter = true
-        play.startAnimation(animation)
-    }
-
-    fun showButton(){
-        val animation = AlphaAnimation(0f, 1f)
-        animation.duration = 500
-        animation.fillAfter = true
-        animation.setAnimationListener(object: Animation.AnimationListener{
-            override fun onAnimationRepeat(p0: Animation?) {}
-
-            override fun onAnimationEnd(p0: Animation?) {
-                Handler().postDelayed({
-                    hideButton()
-                }, 500)
-            }
-
-            override fun onAnimationStart(p0: Animation?) {}
-        })
-        play.startAnimation(animation)
-    }
-
     fun setShareHandler(media: ModelMedia) {
-        if (media.isVideo()) {
-
-        } else {
-            share?.setOnClickListener {
+        share?.setOnClickListener {
+            if (media.isVideo()) {
+                this@ActivityMediaDetail.videoView.shareVideo()
+            } else {
                 onShareItem()
             }
         }

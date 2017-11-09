@@ -35,4 +35,5 @@
     <string name="comments">comments</string>
     <string name="likes">likes</string>
     <string name="something_went_wrong">Oops... Something went wrong</string>
+    <string name="sharing_video_subject">Sharing Video</string>
 </resources>
