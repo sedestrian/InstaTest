@@ -17,9 +17,11 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.webkit.URLUtil
 import android.widget.ImageView
 import com.alessandrogaboardi.instatest.R
+import com.alessandrogaboardi.instatest.adapters.CommentsAdapter
 import com.alessandrogaboardi.instatest.db.daos.DaoMedia
 import com.alessandrogaboardi.instatest.db.models.ModelMedia
 import com.alessandrogaboardi.instatest.kotlin.extensions.realm
@@ -45,8 +47,9 @@ import java.io.IOException
 class ActivityMediaDetail : AppCompatActivity() {
     var id: String = ""
     var working = false
-    val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 29102
+    val MY_PERMISSIONS_REQUEST_WRITE_STORAGE = 29102
     var playing = false
+    var adapter: CommentsAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +94,7 @@ class ActivityMediaDetail : AppCompatActivity() {
         if (description.text.isEmpty()) description.setGone()
         else description.setVisible()
 
+        setupComments(media)
         updateLikeIcon(media)
 
         liked.setOnClickListener {
@@ -104,51 +108,97 @@ class ActivityMediaDetail : AppCompatActivity() {
             }
         }
 
+        setupSaveButton()
+
         save.setOnClickListener {
             saveFileWithPermissions(media)
         }
 
         if (media.isVideo()) {
-            setShareHandler(media)
-            picture.setGone()
-            videoView.setPreviewImage(media.images?.standard_resolution?.url)
-            videoView.setVideoURL(media.videos?.standard_resolution?.url)
-            videoView.setOnPreviewLoaded {
-                supportStartPostponedEnterTransition()
-            }
-            videoView.setOnPreviewLoadError { supportStartPostponedEnterTransition() }
+            setupForVideo(media)
         } else {
-            GlideApp.with(this).load(media.images?.standard_resolution?.url)
-                    .dontAnimate()
-                    .listener(object : RequestListener<Drawable> {
-                        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                            pictureErrorLayout.setVisible()
-                            supportStartPostponedEnterTransition()
-                            return false
-                        }
-
-                        override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                            pictureErrorLayout.setGone()
-                            setShareHandler(media)
-                            supportStartPostponedEnterTransition()
-                            return false
-                        }
-                    })
-                    .into(picture)
-            picture.setOnClickListener {
-                val intent = Intent(this, ActivityFullscreenPicture::class.java)
-                intent.putExtra(ActivityFullscreenPicture.PICTURE_ID_EXTRA, media.id)
-
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        this,
-                        picture,
-                        getString(R.string.fullscreen_element_name)
-                )
-
-                startActivity(intent, options.toBundle())
-            }
+            setupForPicture(media)
         }
         GlideApp.with(this).load(user_pic).circleCrop().into(userPicture)
+    }
+
+    private fun setupSaveButton() {
+        val permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            save.setImageResource(R.drawable.save)
+        } else {
+            save.setImageResource(R.drawable.cannot_save)
+        }
+    }
+
+    private fun setupForVideo(media: ModelMedia) {
+        setShareHandler(media)
+        picture.setGone()
+        videoView.setPreviewImage(media.images?.standard_resolution?.url)
+        videoView.setVideoURL(media.videos?.standard_resolution?.url)
+        videoView.setOnPreviewLoaded {
+            supportStartPostponedEnterTransition()
+        }
+        videoView.setOnPreviewLoadError { supportStartPostponedEnterTransition() }
+    }
+
+    private fun setupForPicture(media: ModelMedia){
+        videoView.setGone()
+        GlideApp.with(this).load(media.images?.standard_resolution?.url)
+                .dontAnimate()
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                        pictureErrorLayout.setVisible()
+                        supportStartPostponedEnterTransition()
+                        return false
+                    }
+
+                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                        pictureErrorLayout.setGone()
+                        setShareHandler(media)
+                        supportStartPostponedEnterTransition()
+                        return false
+                    }
+                })
+                .into(picture)
+        picture.setOnClickListener {
+            val intent = Intent(this, ActivityFullscreenPicture::class.java)
+            intent.putExtra(ActivityFullscreenPicture.PICTURE_ID_EXTRA, media.id)
+
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    this,
+                    picture,
+                    getString(R.string.fullscreen_element_name)
+            )
+
+            startActivity(intent, options.toBundle())
+        }
+    }
+
+    private fun setupComments(media: ModelMedia){
+        recyclerComments.layoutManager = LinearLayoutManager(this)
+        adapter = CommentsAdapter(media.id, {
+            hideLoadingComments()
+        },{
+            hideLoadingComments()
+            if(adapter!!.itemCount == 0){
+                noComments.setVisible()
+            }else{
+                noComments.setGone()
+            }
+        },{
+            showLoadingComments()
+        })
+        recyclerComments.adapter = adapter
+    }
+
+    private fun showLoadingComments(){
+        progressComments.setVisible()
+    }
+
+    private fun hideLoadingComments(){
+        progressComments.setGone()
     }
 
     fun setShareHandler(media: ModelMedia) {
@@ -218,6 +268,7 @@ class ActivityMediaDetail : AppCompatActivity() {
     private fun dislikeMedia(media: ModelMedia) {
         ApiManager.dislikeMedia(media.id, object : LikeMediaCallback {
             override fun onSuccess(call: Call?, response: Response?) {
+                setResult(CHANGED)
                 DaoMedia.setDisliked(media.id)
                 media.user_has_liked = false
                 if (media.likes != null) {
@@ -237,6 +288,7 @@ class ActivityMediaDetail : AppCompatActivity() {
     private fun likeMedia(media: ModelMedia) {
         ApiManager.likeMedia(media.id, object : LikeMediaCallback {
             override fun onSuccess(call: Call?, response: Response?) {
+                setResult(CHANGED)
                 DaoMedia.setLiked(media.id)
                 media.user_has_liked = true
                 if (media.likes != null) {
@@ -271,19 +323,25 @@ class ActivityMediaDetail : AppCompatActivity() {
 
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    MY_PERMISSIONS_REQUEST_READ_CONTACTS)
+                    MY_PERMISSIONS_REQUEST_WRITE_STORAGE)
 
-            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+            // MY_PERMISSIONS_REQUEST_WRITE_STORAGE is an
             // app-defined int constant. The callback method gets the
             // result of the request.
 
         }
     }
 
-
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
+        if (requestCode == MY_PERMISSIONS_REQUEST_WRITE_STORAGE) {
+            if (grantResults.isNotEmpty()
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                save.setImageResource(R.drawable.save)
+            } else {
+                save.setImageResource(R.drawable.cannot_save)
+            }
+        }
     }
 
     private fun downloadPicture(item: ModelMedia) {
@@ -332,5 +390,6 @@ class ActivityMediaDetail : AppCompatActivity() {
 
     companion object {
         val MEDIA_ID_EXTRA = "media_detail_id_extra"
+        val CHANGED = 1
     }
 }

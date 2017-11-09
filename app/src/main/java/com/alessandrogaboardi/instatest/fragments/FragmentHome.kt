@@ -16,6 +16,7 @@ import com.alessandrogaboardi.instatest.adapters.decorators.SpacingItemDecorator
 import com.alessandrogaboardi.instatest.communicators.ActivityHomeCommunicator
 import com.alessandrogaboardi.instatest.db.daos.DaoToken
 import com.alessandrogaboardi.instatest.db.daos.DaoUser
+import com.alessandrogaboardi.instatest.db.models.ModelMedia
 import com.alessandrogaboardi.instatest.db.models.ModelUser
 import com.alessandrogaboardi.instatest.kotlin.extensions.*
 import com.alessandrogaboardi.instatest.modules.GlideApp
@@ -83,6 +84,12 @@ class FragmentHome : Fragment() {
     private fun setupData() {
         setupUserData()
         setupMedia()
+    }
+
+    fun updateItem(media: ModelMedia?){
+        media?.let {
+            adapter?.updateItem(media)
+        }
     }
 
     private fun setupMedia() {

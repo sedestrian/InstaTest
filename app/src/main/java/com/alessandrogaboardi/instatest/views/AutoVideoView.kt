@@ -54,6 +54,7 @@ class AutoVideoView : FrameLayout {
     }
 
     private fun setupViews() {
+        autoVideoViewVideo.setGone()
         setupPreviewImage()
         setupVideoView()
         setupControls()
@@ -103,8 +104,13 @@ class AutoVideoView : FrameLayout {
 
     private fun setPlaying() {
         playing = true
-        if (autoVideoViewPicture.visibility == View.VISIBLE)
+        if (autoVideoViewPicture.visibility == View.VISIBLE) {
+            val height = autoVideoViewPicture.measuredHeight
+            autoVideoViewVideo.layoutParams.height = height
+            autoVideoViewVideo.setVisible()
+            autoVideoViewVideo.requestLayout()
             autoVideoViewPicture.setGone()
+        }
         autoVideoViewVideo.start()
         autoVideoViewPlay.setImageResource(R.drawable.pause)
         Handler().postDelayed({

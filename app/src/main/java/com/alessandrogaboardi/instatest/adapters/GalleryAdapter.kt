@@ -9,6 +9,7 @@ import com.alessandrogaboardi.instatest.R
 import com.alessandrogaboardi.instatest.adapters.holders.GalleryViewHolder
 import com.alessandrogaboardi.instatest.db.daos.DaoMedia
 import com.alessandrogaboardi.instatest.db.models.ModelMedia
+import com.alessandrogaboardi.instatest.kotlin.extensions.realm
 import com.alessandrogaboardi.instatest.ws.ApiManager
 import com.alessandrogaboardi.instatest.ws.callbacks.UserPicturesCallback
 import io.realm.Realm
@@ -27,7 +28,7 @@ class GalleryAdapter(val context: Context, val dataDownloaded: (() -> Unit)?, va
         downloadData()
     }
 
-    fun setupLocal() {
+    fun setupLocal(listener: (() -> Unit)?) {
         val mediaResult = DaoMedia.getUserMediaAsync()
 
         mediaResult.addChangeListener { result ->
@@ -39,8 +40,25 @@ class GalleryAdapter(val context: Context, val dataDownloaded: (() -> Unit)?, va
 
             mediaResult.removeAllChangeListeners()
 
-            notifyDataSetChanged()
+            if (listener == null) {
+                notifyDataSetChanged()
+            } else {
+                listener.invoke()
+            }
         }
+    }
+
+    fun updateItem(media: ModelMedia) {
+        val position = pictures.indexOfFirst { it.id == media.id }
+        val mediaResult = DaoMedia.getByIdAsync(media.id)
+        mediaResult.addChangeListener<ModelMedia> { mediaObject ->
+            pictures[position] = if (mediaObject.isManaged) realm.copyFromRealm(mediaObject) else mediaObject
+            notifyItemChanged(position)
+        }
+    }
+
+    fun setupLocal() {
+        setupLocal(null)
     }
 
     fun refresh() {

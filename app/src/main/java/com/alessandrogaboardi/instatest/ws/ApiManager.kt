@@ -1,6 +1,7 @@
 package com.alessandrogaboardi.instatest.ws
 
 import com.alessandrogaboardi.instatest.db.daos.DaoToken
+import com.alessandrogaboardi.instatest.ws.callbacks.GetCommentsCallback
 import com.alessandrogaboardi.instatest.ws.callbacks.LikeMediaCallback
 import com.alessandrogaboardi.instatest.ws.callbacks.UserDataCallback
 import com.alessandrogaboardi.instatest.ws.callbacks.UserPicturesCallback
@@ -24,6 +25,16 @@ object ApiManager {
     fun getSelfMedia(callback: UserPicturesCallback){
         val request = Request.Builder()
                 .url(ApiConstants.GET_SELF_MEDIA + DaoToken.getToken()?.token)
+                .build()
+
+        addToRequestQueue(request, callback)
+    }
+
+    fun getMediaComments(media_id: String, callback: GetCommentsCallback){
+        val url = String.format(ApiConstants.GET_MEDIA_COMMENTS, media_id) + DaoToken.getToken()?.token
+        println(url)
+        val request = Request.Builder()
+                .url(url)
                 .build()
 
         addToRequestQueue(request, callback)

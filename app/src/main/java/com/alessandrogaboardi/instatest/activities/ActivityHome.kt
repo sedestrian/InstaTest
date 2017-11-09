@@ -15,6 +15,10 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.gallery_item.view.*
 
 class ActivityHome : AppCompatActivity(), ActivityHomeCommunicator {
+    val REQUEST_DETAIL_ACTIVITY = 32931
+    var fragment: FragmentHome = FragmentHome.newInstance()
+    var currentMedia: ModelMedia? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -22,11 +26,12 @@ class ActivityHome : AppCompatActivity(), ActivityHomeCommunicator {
 
         supportActionBar?.title = getString(R.string.app_name)
 
-        replaceMainFragment(FragmentHome.newInstance(), R.id.placeholder, false)
+        replaceMainFragment(fragment, R.id.placeholder, false)
     }
 
 
     override fun onMediaDetailRequested(item: ModelMedia, view: View) {
+        currentMedia = item
         val intent = Intent(this, ActivityMediaDetail::class.java)
         intent.putExtra(ActivityMediaDetail.MEDIA_ID_EXTRA, item.id)
 
@@ -40,13 +45,22 @@ class ActivityHome : AppCompatActivity(), ActivityHomeCommunicator {
                 Pair(view.picture, getString(imageTrans)),
                 Pair(view.liked, getString(R.string.transition_media_detail_liked_icon)),
 //                Pair(view.likes, getString(R.string.transition_media_detail_liked_text)),
-                Pair(view.commentsIcon, getString(R.string.transition_media_detail_comment_icon)),
+//                Pair(view.commentsIcon, getString(R.string.transition_media_detail_comment_icon)),
 //                Pair(view.comments, getString(R.string.transition_media_detail_comment_text)),
-                Pair(view.userPicture, getString(R.string.transition_media_detail_user_picture)),
-                Pair(view.username, getString(R.string.transition_media_detail_username))
+                Pair(view.userPicture, getString(R.string.transition_media_detail_user_picture))
+//                Pair(view.username, getString(R.string.transition_media_detail_username))
 //                Pair(view.description, getString(R.string.transition_media_detail_description))
         )
 
-        startActivity(intent, options.toBundle())
+        //noinspection RestrictedApi
+        startActivityForResult(intent, REQUEST_DETAIL_ACTIVITY, options.toBundle())
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_DETAIL_ACTIVITY)
+            if(resultCode == ActivityMediaDetail.CHANGED){
+                fragment?.updateItem(currentMedia)
+            }
     }
 }

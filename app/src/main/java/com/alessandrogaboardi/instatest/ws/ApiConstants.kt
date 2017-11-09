@@ -11,4 +11,6 @@ object ApiConstants {
     val GET_SELF_MEDIA = BASE_API_URL + "users/self/media/recent/?access_token="
     val LIKE_PICTURE = BASE_API_URL + "media/%s/likes?access_token="
     val DISLIKE_PICTURE = BASE_API_URL + "media/%s/likes?access_token="
+    val GET_MEDIA_COMMENTS = BASE_API_URL + "media/%s/comments?access_token="
+    val SEND_MEDIA_COMMENT = BASE_API_URL + "media/%s/comment?access_token="
 }

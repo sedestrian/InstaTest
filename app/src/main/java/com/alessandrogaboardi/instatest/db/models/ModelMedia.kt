@@ -13,7 +13,7 @@ open class ModelMedia(
         var id: String = "",
         var user: ModelUser? = ModelUser(),
         var images: ModelImages? = ModelImages(),
-        var created_time: String = "",
+        var created_time: Long? = null,
         var caption: ModelCaption? = ModelCaption(),
         var user_has_liked: Boolean = false,
         var likes: ModelCount? = ModelCount(),
