@@ -1,20 +1,29 @@
 package com.alessandrogaboardi.instatest.activities
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.os.Handler
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.webkit.URLUtil
+import android.widget.ImageView
 import com.alessandrogaboardi.instatest.R
 import com.alessandrogaboardi.instatest.db.daos.DaoMedia
 import com.alessandrogaboardi.instatest.db.models.ModelMedia
@@ -34,12 +43,15 @@ import okhttp3.Call
 import okhttp3.Response
 import org.jetbrains.anko.downloadManager
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
 
 
 class ActivityMediaDetail : AppCompatActivity() {
     var id: String = ""
+    var working = false
     val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 29102
+    var playing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,10 +99,13 @@ class ActivityMediaDetail : AppCompatActivity() {
         updateLikeIcon(media)
 
         liked.setOnClickListener {
-            if (hasLiked) {
-                dislikeMedia(media)
-            } else {
-                likeMedia(media)
+            if (!working) {
+                working = true
+                if (media.user_has_liked) {
+                    dislikeMedia(media)
+                } else {
+                    likeMedia(media)
+                }
             }
         }
 
@@ -98,23 +113,147 @@ class ActivityMediaDetail : AppCompatActivity() {
             saveFileWithPermissions(media)
         }
 
-        GlideApp.with(this).load(media.images?.standard_resolution?.url)
-                .dontAnimate()
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                        pictureErrorLayout.setVisible()
-                        supportStartPostponedEnterTransition()
-                        return false
-                    }
+        if (media.isVideo()) {
+            val uri = Uri.parse(media.videos?.standard_resolution?.url)
+            video.setVideoURI(uri)
+            video.setOnClickListener {
+                showButton()
+            }
+            video.requestLayout()
+            video.setOnCompletionListener {
+                playing = false
+                play.setImageResource(R.drawable.play)
+            }
+            GlideApp.with(this).load(media.images?.standard_resolution?.url)
+                    .dontAnimate()
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                            pictureErrorLayout.setVisible()
+                            supportStartPostponedEnterTransition()
+                            return false
+                        }
 
-                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                        pictureErrorLayout.setGone()
-                        supportStartPostponedEnterTransition()
-                        return false
-                    }
-                })
-                .into(picture)
+                        override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                            pictureErrorLayout.setGone()
+                            supportStartPostponedEnterTransition()
+                            play.setOnClickListener {
+                                if (playing) {
+                                    video.pause()
+                                    play.setImageResource(R.drawable.play)
+                                    playing = false
+                                } else {
+                                    if (picture.visibility == View.VISIBLE)
+                                        picture.setGone()
+                                    video.start()
+                                    play.setImageResource(R.drawable.pause)
+                                    playing = true
+                                    Handler().postDelayed({
+                                        hideButton()
+                                    }, 500)
+                                }
+                            }
+                            return false
+                        }
+                    })
+                    .into(picture)
+        } else {
+            GlideApp.with(this).load(media.images?.standard_resolution?.url)
+                    .dontAnimate()
+                    .listener(object : RequestListener<Drawable> {
+                        override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                            pictureErrorLayout.setVisible()
+                            supportStartPostponedEnterTransition()
+                            return false
+                        }
+
+                        override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
+                            pictureErrorLayout.setGone()
+                            setShareHandler(media)
+                            supportStartPostponedEnterTransition()
+                            return false
+                        }
+                    })
+                    .into(picture)
+        }
         GlideApp.with(this).load(user_pic).circleCrop().into(userPicture)
+    }
+
+    fun hideButton(){
+        val animation = AlphaAnimation(1f, 0f)
+        animation.duration = 500
+        animation.fillAfter = true
+        play.startAnimation(animation)
+    }
+
+    fun showButton(){
+        val animation = AlphaAnimation(0f, 1f)
+        animation.duration = 500
+        animation.fillAfter = true
+        animation.setAnimationListener(object: Animation.AnimationListener{
+            override fun onAnimationRepeat(p0: Animation?) {}
+
+            override fun onAnimationEnd(p0: Animation?) {
+                Handler().postDelayed({
+                    hideButton()
+                }, 500)
+            }
+
+            override fun onAnimationStart(p0: Animation?) {}
+        })
+        play.startAnimation(animation)
+    }
+
+    fun setShareHandler(media: ModelMedia) {
+        if (media.isVideo()) {
+
+        } else {
+            share?.setOnClickListener {
+                onShareItem()
+            }
+        }
+    }
+
+    fun onShareItem() {
+        // Get access to the URI for the bitmap
+        val bmpUri = getLocalBitmapUri(picture)
+        if (bmpUri != null) {
+            // Construct a ShareIntent with link to image
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.putExtra(Intent.EXTRA_STREAM, bmpUri)
+            shareIntent.type = "image/*"
+            // Launch sharing dialog for image
+            startActivity(Intent.createChooser(shareIntent, "Share Image"))
+        } else {
+            // ...sharing failed, handle error
+        }
+    }
+
+    private fun getLocalBitmapUri(imageView: ImageView): Uri? {
+        // Extract Bitmap from ImageView drawable
+        val drawable = imageView.drawable;
+        var bmp: Bitmap? = null;
+        if (drawable is BitmapDrawable) {
+            bmp = (imageView.drawable as BitmapDrawable).bitmap;
+        } else {
+            return null
+        }
+        // Store image to default external storage directory
+        var bmpUri: Uri? = null;
+        try {
+            // Use methods on Context to access package-specific directories on external storage.
+            // This way, you don't need to request external read/write permission.
+            // See https://youtu.be/5xVh-7ywKpE?t=25m25s
+            val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "share_image_" + System.currentTimeMillis() + ".png")
+            val out = FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.close();
+            // **Warning:** This will fail for API >= 24, use a FileProvider as shown below instead.
+            bmpUri = Uri.fromFile(file);
+        } catch (e: IOException) {
+            e.printStackTrace();
+        }
+        return bmpUri
     }
 
     private fun updateLikeIcon(item: ModelMedia) {
@@ -137,10 +276,12 @@ class ActivityMediaDetail : AppCompatActivity() {
                     media.likes!!.count = media.likes!!.count - 1
                 }
                 updateLikeIcon(media)
+                working = false
             }
 
             override fun onError(call: Call?, e: IOException?) {
                 snack(picture, getString(R.string.error_dislike), true)
+                working = false
             }
         })
     }
@@ -154,10 +295,12 @@ class ActivityMediaDetail : AppCompatActivity() {
                     media.likes!!.count = media.likes!!.count + 1
                 }
                 updateLikeIcon(media)
+                working = false
             }
 
             override fun onError(call: Call?, e: IOException?) {
                 snack(picture, getString(R.string.error_like), true)
+                working = false
             }
         })
     }
@@ -188,6 +331,7 @@ class ActivityMediaDetail : AppCompatActivity() {
 
         }
     }
+
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)

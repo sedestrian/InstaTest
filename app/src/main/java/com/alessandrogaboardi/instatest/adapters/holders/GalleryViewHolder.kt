@@ -27,6 +27,7 @@ class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     var username = itemView.username
     var userPicture = itemView.userPicture
     var description = itemView.description
+    private var working = false
 
     fun bind(item: ModelMedia, onDetailRequested: ((item: ModelMedia, mainView: View) -> Unit)?) {
         val pict = item.images?.low_resolution
@@ -50,10 +51,13 @@ class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         updateLikeIcon(item)
 
         this.liked.setOnClickListener {
-            if (item.user_has_liked) {
-                dislikeMedia(item)
-            } else {
-                likeMedia(item)
+            if(!working) {
+                working = true
+                if (item.user_has_liked) {
+                    dislikeMedia(item)
+                } else {
+                    likeMedia(item)
+                }
             }
         }
 
@@ -82,10 +86,12 @@ class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                     media.likes!!.count = media.likes!!.count - 1
                 }
                 updateLikeIcon(media)
+                working = false
             }
 
             override fun onError(call: Call?, e: IOException?) {
                 snack(this@GalleryViewHolder.picture, itemView.context.getString(R.string.error_dislike), true)
+                working = false
             }
         })
     }
@@ -99,10 +105,12 @@ class GalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                     media.likes!!.count = media.likes!!.count + 1
                 }
                 updateLikeIcon(media)
+                working = false
             }
 
             override fun onError(call: Call?, e: IOException?) {
                 snack(this@GalleryViewHolder.picture, itemView.context.getString(R.string.error_like), true)
+                working = false
             }
         })
     }
