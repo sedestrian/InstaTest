@@ -3,7 +3,6 @@ package com.alessandrogaboardi.instatest.activities
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.ActivityOptionsCompat
-import android.support.v4.app.SharedElementCallback
 import android.support.v4.util.Pair
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -12,7 +11,6 @@ import com.alessandrogaboardi.instatest.communicators.ActivityHomeCommunicator
 import com.alessandrogaboardi.instatest.db.models.ModelMedia
 import com.alessandrogaboardi.instatest.fragments.FragmentHome
 import com.alessandrogaboardi.instatest.kotlin.extensions.replaceMainFragment
-import com.alessandrogaboardi.instatest.kotlin.extensions.setGone
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.gallery_item.view.*
 
@@ -29,12 +27,17 @@ class ActivityHome : AppCompatActivity(), ActivityHomeCommunicator {
 
 
     override fun onMediaDetailRequested(item: ModelMedia, view: View) {
-        var intent = Intent(this, ActivityMediaDetail::class.java)
+        val intent = Intent(this, ActivityMediaDetail::class.java)
         intent.putExtra(ActivityMediaDetail.MEDIA_ID_EXTRA, item.id)
+
+        val imageTrans = if (item.isVideo())
+            R.string.transition_media_detail_video
+        else
+            R.string.transition_media_detail_image
 
         val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 this,
-                Pair(view.picture, getString(R.string.transition_media_detail_image)),
+                Pair(view.picture, getString(imageTrans)),
                 Pair(view.liked, getString(R.string.transition_media_detail_liked_icon)),
 //                Pair(view.likes, getString(R.string.transition_media_detail_liked_text)),
                 Pair(view.commentsIcon, getString(R.string.transition_media_detail_comment_icon)),

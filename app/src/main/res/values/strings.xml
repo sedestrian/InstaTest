@@ -13,6 +13,7 @@
     <string name="fullscreen_element_name">fullscreen_picture_transition</string>
     <string name="transition_media_detail">transition_name_media_detail</string>
     <string name="transition_media_detail_image">transition_name_media_detail_image_view</string>
+    <string name="transition_media_detail_video">transition_name_media_detail_video_view</string>
     <string name="transition_media_detail_liked_icon">transition_name_media_detail_liked_icon</string>
     <string name="transition_media_detail_liked_text">transition_name_media_detail_liked_text</string>
     <string name="transition_media_detail_comment_icon">transition_name_media_detail_comment_icon</string>
@@ -34,4 +35,5 @@
     <string name="comments">comments</string>
     <string name="likes">likes</string>
     <string name="something_went_wrong">Oops... Something went wrong</string>
+    <string name="sharing_video_subject">Sharing Video</string>
 </resources>

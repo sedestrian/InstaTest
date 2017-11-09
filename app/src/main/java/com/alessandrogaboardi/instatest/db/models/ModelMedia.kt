@@ -2,6 +2,7 @@ package com.alessandrogaboardi.instatest.db.models
 
 import io.realm.RealmList
 import io.realm.RealmObject
+import io.realm.annotations.Ignore
 import io.realm.annotations.PrimaryKey
 
 /**
@@ -24,6 +25,11 @@ open class ModelMedia(
         var location: ModelLocation? = ModelLocation(),
         var videos: ModelVideos? = ModelVideos()
 ) : RealmObject() {
+    @Ignore
+    private val VIDEO = "video"
+
+    fun isVideo(): Boolean = type == VIDEO
+
     companion object {
         val ID = "id"
     }
