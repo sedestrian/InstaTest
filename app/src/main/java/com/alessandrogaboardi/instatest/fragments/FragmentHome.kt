@@ -86,7 +86,7 @@ class FragmentHome : Fragment() {
         setupMedia()
     }
 
-    fun updateItem(media: ModelMedia?){
+    fun updateItem(media: ModelMedia?) {
         media?.let {
             adapter?.updateItem(media)
         }
@@ -95,23 +95,23 @@ class FragmentHome : Fragment() {
     private fun setupMedia() {
         val divider = SpacingItemDecorator(dip(8), dip(8))
         media.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        media.addItemDecoration(divider)
+        media?.addItemDecoration(divider)
         adapter = GalleryAdapter(activity!!, {
-            refresh.isRefreshing = false
-            if (media.visibility == View.GONE) {
-                media.setVisible()
+            refresh?.isRefreshing = false
+            if (media?.visibility == View.GONE) {
+                media?.setVisible()
             }
-            noPicturesLayout.setGone()
+            noPicturesLayout?.setGone()
         }, {
             if (adapter?.itemCount == 0)
-                noPicturesLayout.setVisible()
+                noPicturesLayout?.setVisible()
             else
                 snack(refresh, R.string.error_occurred, R.string.retry, { adapter?.refresh() })
             refresh.isRefreshing = false
         }, { item, view ->
             communicator?.onMediaDetailRequested(item, view)
         })
-        media.adapter = adapter
+        media?.adapter = adapter
     }
 
     private fun setupUserData() {
@@ -131,10 +131,12 @@ class FragmentHome : Fragment() {
 
                     userData.removeAllChangeListeners()
 
-                    if (user.profile_picture.isNotEmpty())
-                        GlideApp.with(activity).load(user.profile_picture).circleCrop().into(activity?.profileIcon)
-                    else
-                        GlideApp.with(activity).load(R.drawable.no_account).circleCrop().into(activity?.profileIcon)
+                    if (activity != null) {
+                        if (user.profile_picture.isNotEmpty())
+                            GlideApp.with(activity).load(user.profile_picture).circleCrop().into(activity?.profileIcon)
+                        else
+                            GlideApp.with(activity).load(R.drawable.no_account).circleCrop().into(activity?.profileIcon)
+                    }
 
                     activity?.profileIcon?.setOnClickListener {
                         openProfileActivity()

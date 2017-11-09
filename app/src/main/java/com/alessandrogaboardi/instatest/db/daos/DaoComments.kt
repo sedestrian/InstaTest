@@ -15,6 +15,6 @@ object DaoComments : BaseDao() {
     }
 
     fun getMediaCommentsAsync(mediaId: String): RealmResults<ModelCaption> {
-        return realm.where(ModelCaption::class.java).equalTo(ModelCaption.MEDIA_ID, mediaId).findAllSortedAsync(ModelCaption.CREATED_TIME, Sort.DESCENDING)
+        return realm.where(ModelCaption::class.java).equalTo(ModelCaption.MEDIA_ID, mediaId).findAllSortedAsync(ModelCaption.CREATED_TIME, Sort.ASCENDING)
     }
 }

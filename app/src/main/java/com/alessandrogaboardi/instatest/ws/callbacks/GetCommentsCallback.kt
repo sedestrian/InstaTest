@@ -27,15 +27,21 @@ interface GetCommentsCallback : ApiCallback {
         val responseString = String(response.body()!!.bytes())
         if(responseString.isNotEmpty()) {
             val jsonObject = JSONObject(responseString)
-            val commentsJson = jsonObject.getJSONArray(DATA_FIELD)
-            val type = object : TypeToken<MutableList<ModelCaption>>() {}.type
-            val comments = Gson().fromJson<MutableList<ModelCaption>>(commentsJson.toString(), type)
-            comments.forEach { it.mediaId = callbackMediaId }
+            if(jsonObject.has(DATA_FIELD)) {
+                val commentsJson = jsonObject.getJSONArray(DATA_FIELD)
+                val type = object : TypeToken<MutableList<ModelCaption>>() {}.type
+                val comments = Gson().fromJson<MutableList<ModelCaption>>(commentsJson.toString(), type)
+                comments.forEach { it.mediaId = callbackMediaId }
 
-            DaoComments.saveComments(comments)
+                DaoComments.saveComments(comments)
 
-            uiThread {
-                onSuccess(call, response)
+                uiThread {
+                    onSuccess(call, response)
+                }
+            }else{
+                uiThread {
+                    onError(call, null)
+                }
             }
         }else{
             uiThread {

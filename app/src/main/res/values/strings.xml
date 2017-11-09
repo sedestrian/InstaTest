@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources[<!ENTITY CLIENT_ID "3feb038bb46d4d848121b3b9f17e3a0e"><!ENTITY REDIRECT_URI "http://www.instagram.com">]>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources[<!ENTITY CLIENT_ID "3944ab3066d34aaa8d378857a46f0ae9"><!ENTITY REDIRECT_URI "https://www.instagram.com">]>
 <resources>
     <string name="app_name">Coonstagram</string>
     <string name="action_settings">Settings</string>
@@ -36,4 +36,5 @@
     <string name="likes">likes</string>
     <string name="something_went_wrong">Oops... Something went wrong</string>
     <string name="sharing_video_subject">Sharing Video</string>
+    <string name="no_comments">No comments</string>
 </resources>

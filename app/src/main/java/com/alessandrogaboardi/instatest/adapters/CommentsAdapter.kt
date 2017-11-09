@@ -17,7 +17,7 @@ import java.io.IOException
 /**
  * Created by alessandrogaboardi on 09/11/2017.
  */
-class CommentsAdapter(val mediaId: String, loadError: (() -> Unit)?, loaded: (() -> Unit)?, loadStarted: (() -> Unit)?) : RecyclerView.Adapter<CommentViewHolder>() {
+class CommentsAdapter(val mediaId: String, val loadError: (() -> Unit)?, val loaded: (() -> Unit)?, val loadStarted: (() -> Unit)?) : RecyclerView.Adapter<CommentViewHolder>() {
     var comments: MutableList<ModelCaption> = mutableListOf()
 
     init {
@@ -28,7 +28,6 @@ class CommentsAdapter(val mediaId: String, loadError: (() -> Unit)?, loaded: (()
                 set(value) {}
 
             override fun onSuccess(call: Call?, response: Response?) {
-                loaded?.invoke()
                 setupComments()
             }
 
@@ -47,6 +46,7 @@ class CommentsAdapter(val mediaId: String, loadError: (() -> Unit)?, loaded: (()
                 commentObject
 
             notifyDataSetChanged()
+            loaded?.invoke()
         }
     }
 
