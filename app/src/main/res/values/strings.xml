@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources[<!ENTITY CLIENT_ID "3944ab3066d34aaa8d378857a46f0ae9"><!ENTITY REDIRECT_URI "https://www.instagram.com">]>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources[<!ENTITY CLIENT_ID "3944ab3066d34aaa8d378857a46f0ae9"><!ENTITY REDIRECT_URI "https://www.instagram.com">]
+    >
 <resources>
     <string name="app_name">Coonstagram</string>
     <string name="action_settings">Settings</string>

@@ -3,10 +3,12 @@ package com.alessandrogaboardi.instatest.views
 import android.animation.Animator
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Handler
-import android.support.v4.content.ContextCompat.startActivity
+import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
@@ -35,22 +37,39 @@ class AutoVideoView : FrameLayout {
     private var videoUri: Uri? = null
 
     private var playing: Boolean = false
+    private var tintColor: Int = Color.WHITE
 
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
-        init(context)
+        init(context, attrs)
     }
 
     constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
-        init(context)
+        init(context, attrs)
     }
 
     constructor(context: Context) : super(context) {
-        init(context)
+        init(context, null)
     }
 
-    private fun init(context: Context) {
+    private fun init(context: Context, attrs: AttributeSet?) {
+        setupAttrs(attrs)
         View.inflate(context, R.layout.video_view, this)
         setupViews()
+    }
+
+    private fun setupAttrs(attrs: AttributeSet?) {
+        attrs?.let {
+            val a = context.theme.obtainStyledAttributes(
+                    attrs,
+                    R.styleable.AutoVideoView,
+                    0, 0)
+
+            try {
+                tintColor = a.getColor(R.styleable.AutoVideoView_video_controls_tint, Color.WHITE)
+            } finally {
+                a.recycle();
+            }
+        }
     }
 
     private fun setupViews() {
@@ -62,6 +81,7 @@ class AutoVideoView : FrameLayout {
 
     private fun setupControls() {
         autoVideoViewPlay.setImageResource(R.drawable.play)
+        tintButton()
         autoVideoViewPlay.setOnClickListener {
             if (playing) {
                 setPaused()
@@ -170,6 +190,10 @@ class AutoVideoView : FrameLayout {
             i.putExtra(Intent.EXTRA_TEXT, it.toString())
             context.startActivity(Intent.createChooser(i, context.getString(R.string.sharing_video_subject)))
         }
+    }
+
+    private fun tintButton() {
+        autoVideoViewPlay.setColorFilter(tintColor)
     }
 
     fun setPreviewImage(url: String?) {

@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="AutoVideoView">
+        <attr name="video_controls_tint" format="color"/>
+    </declare-styleable>
+</resources>
